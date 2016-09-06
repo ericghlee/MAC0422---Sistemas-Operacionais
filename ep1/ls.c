@@ -11,17 +11,10 @@
 #include <grp.h>
 #include <time.h>
 
-void list_files();
+#include "ls.h"
+
 char* get_file_name(FILE * file);
 void print_file_info(char* file_name);
-
-int main(int argc, char **argv)
-{
-    
-    list_files();
-
-    return 0;
-}
 
 void list_files()
 {
@@ -121,7 +114,11 @@ void print_file_info(char* file_name)
 
     printf("%d ", (int) file_info.st_size);
 
-    strftime(buffer, 26, "%b  %d %H:%M", localtime(&file_info.st_mtime));
+    strftime(buffer, sizeof (buffer), "%b  %d %H:%M", localtime(&file_info.st_mtime));
     printf("%s ", buffer);
-    // printf("%s", &file_info.st_mtime);
+}
+
+void print_list_files_usage() 
+{
+	printf("Usage: ls -l \n");
 }
