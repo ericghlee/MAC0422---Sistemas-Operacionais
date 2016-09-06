@@ -9,12 +9,21 @@
 #include <libgen.h>
 #include <pwd.h>
 #include <grp.h>
+#include <time.h>
 
+void list_files();
 char* get_file_name(FILE * file);
-char* get_file_permissions(char* file_name);
-char* get_file_owner(char* file_name);
+void print_file_info(char* file_name);
 
 int main(int argc, char **argv)
+{
+    
+    list_files();
+
+    return 0;
+}
+
+void list_files()
 {
     DIR* FD;
     struct dirent* in_file;
@@ -23,13 +32,14 @@ int main(int argc, char **argv)
     char* file_name;
     char* file_permissions;
     char* file_owner;
+    char* file_info;
 
     /* Scanning the in directory */
     if (NULL == (FD = opendir ("."))) 
     {
         fprintf(stderr, "Error : Failed to open input directory - %s\n", strerror(errno));
 
-        return 1;
+        return;
     }
 
     while ((in_file = readdir(FD))) 
@@ -46,29 +56,23 @@ int main(int argc, char **argv)
         {
             fprintf(stderr, "Error : Failed to open entry file - %s\n", strerror(errno));
 
-            return 1;
+            return;
         }
 
         file_name = get_file_name(entry_file);
-        file_permissions = get_file_permissions(file_name);
-        file_owner = get_file_owner(file_name);
-        printf("%s %s %s\n",file_permissions, file_owner, file_name);
+        // file_permissions = get_file_permissions(file_name);
+        // file_owner = get_file_owner(file_name);
+        print_file_info(file_name);
 
-        // /* Doing some struf with entry_file : */
-        // /* For example use fgets */
-        // while (fgets(buffer, BUFSIZ, entry_file) != NULL)
-        // {
-        //     /* Use fprintf or fwrite to write some stuff into common_file*/
-        // }
+        printf("%s\n", file_name);
 
-        // /* When you finish with the file, close it */
-        free(file_permissions);
-        free(file_owner);
-        free(file_name);
+        free(file_info);
+        // free(file_name);
+        // free(file_permissions);
+        // free(file_owner);
+
         fclose(entry_file);
     }
-
-    return 0;
 }
 
 char* get_file_name(FILE * file) 
@@ -87,39 +91,37 @@ char* get_file_name(FILE * file)
     return result;
 }
 
-char* get_file_permissions(char* file_name) 
+void print_file_info(char* file_name) 
 {
     struct stat file_info;
-    stat(file_name,&file_info);
-    char* permissions = malloc(sizeof(char) * 10);
-
-    strcat(permissions, (S_ISDIR(file_info.st_mode)) ? "d" : "-");
-    strcat(permissions, (file_info.st_mode & S_IRUSR) ? "r" : "-");
-    strcat(permissions, (file_info.st_mode & S_IWUSR) ? "w" : "-");
-    strcat(permissions, (file_info.st_mode & S_IXUSR) ? "x" : "-");
-    strcat(permissions, (file_info.st_mode & S_IRGRP) ? "r" : "-");
-    strcat(permissions, (file_info.st_mode & S_IWGRP) ? "w" : "-");
-    strcat(permissions, (file_info.st_mode & S_IXGRP) ? "x" : "-");
-    strcat(permissions, (file_info.st_mode & S_IROTH) ? "r" : "-");
-    strcat(permissions, (file_info.st_mode & S_IWOTH) ? "w" : "-");
-    strcat(permissions, (file_info.st_mode & S_IXOTH) ? "x" : "-");
-
-    return permissions;
-}
-
-char* get_file_owner(char* file_name) 
-{
-    struct stat file_info;
-    stat(file_name,&file_info);
     struct passwd *pw;
     struct group  *gr;
+    struct tm *tmp;
+    char buffer[26];
+
+    stat(file_name, &file_info);
+
+    printf((S_ISDIR(file_info.st_mode)) ? "d" : "-");
+    printf((file_info.st_mode & S_IRUSR) ? "r" : "-");
+    printf((file_info.st_mode & S_IWUSR) ? "w" : "-");
+    printf((file_info.st_mode & S_IXUSR) ? "x" : "-");
+    printf((file_info.st_mode & S_IRGRP) ? "r" : "-");
+    printf((file_info.st_mode & S_IWGRP) ? "w" : "-");
+    printf((file_info.st_mode & S_IXGRP) ? "x" : "-");
+    printf((file_info.st_mode & S_IROTH) ? "r" : "-");
+    printf((file_info.st_mode & S_IWOTH) ? "w" : "-");
+    printf((file_info.st_mode & S_IXOTH) ? "x" : "-");
+    printf(" ");
+
+    printf("%d ", file_info.st_nlink);
+
     pw = getpwuid(file_info.st_uid);
     gr = getgrgid(file_info.st_gid);
+    printf("%s %s ", pw->pw_name, gr->gr_name);
 
-    char* result = malloc(sizeof(pw->pw_name) + sizeof(gr->gr_name) + 1);
-    strcat(result, pw->pw_name);
-    strcat(result, " ");
-    strcat(result, gr->gr_name);
+    printf("%d ", (int) file_info.st_size);
 
-    return result;
+    strftime(buffer, 26, "%b  %d %H:%M", localtime(&file_info.st_mtime));
+    printf("%s ", buffer);
+    // printf("%s", &file_info.st_mtime);
 }
