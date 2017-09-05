@@ -10,6 +10,7 @@
 void ep1sh_loop();
 char *ep1sh_read_line();
 char **ep1sh_split_line(char *line);
+int ep1sh_execute(char **args);
 
 int main(int argc, char **argv)
 {
