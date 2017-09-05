@@ -7,8 +7,8 @@
 struct process * default_head = NULL;
 struct process * current = NULL;
 
-void insert_new(int arrival_time, char * name, int duration, int deadline, int elapsed_time) {
-  struct process * link = (struct process * ) malloc(sizeof(struct process));
+void insert_new(int arrival_time, char* name, int duration, int deadline, int elapsed_time) {
+  struct process* link = (struct process* ) malloc(sizeof(struct process));
 
   link -> arrival_time = arrival_time;
   link -> name = name;

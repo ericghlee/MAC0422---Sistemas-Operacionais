@@ -1,11 +1,12 @@
 #include <stdio.h> 
 #include <stdbool.h> 
 #include <stdlib.h> 
+#include <string.h>
 #include "process.h"
 #include "file_utils.h"
 
 struct process* waiting = NULL;
-int time_count = 0;
+float time_count = 0;
 
 bool has_waiting() {
   return waiting != NULL;
@@ -54,7 +55,7 @@ struct process* get_shortest_job() {
 }
 
 void run_process(struct process* link, int time) {
-  printf("%d: [%s] %d->%d \n", time_count, link->name, time_count, time_count+time);
+  printf("%.1f: [%s] %.1f->%.1f \n", time_count, link->name, time_count, time_count+time);
   // simulate_process(time);
   link->elapsed_time = link->elapsed_time + time;
   time_count += time;
@@ -173,7 +174,10 @@ void test() {
 int main(int argc, char** argv) {
   read_file(argv[2]);
 
-  sjf();
+  if (strcmp(argv[1], "1") == 0) {
+    sjf();
+  }
+
   // if (strcmp(argv[1], "1") == 0) {
     // fcfs();
   // } else if (strcmp(argv[1], "2") == 0) {
