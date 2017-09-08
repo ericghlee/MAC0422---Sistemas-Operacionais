@@ -7,15 +7,15 @@
 struct process * default_head = NULL;
 struct process * current = NULL;
 
-void insert_new(int arrival_time, char* name, int duration, int deadline, int elapsed_time) {
+void insert_new(float arrival_time, float duration, float deadline, char* name) {
   struct process* link = (struct process* ) malloc(sizeof(struct process));
 
-  link -> arrival_time = arrival_time;
-  link -> name = name;
-  link -> duration = duration;
-  link -> deadline = deadline;
-  link -> elapsed_time = elapsed_time;
-  link -> next = default_head;
+  link->arrival_time = arrival_time;
+  link->name = name;
+  link->duration = duration;
+  link->deadline = deadline;
+  link->elapsed_time = 0;
+  link->next = default_head;
 
   default_head = link;
 }

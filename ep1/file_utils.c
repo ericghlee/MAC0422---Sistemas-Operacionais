@@ -4,7 +4,8 @@
 #include <stdbool.h> 
 #include <assert.h>
 #include "file_utils.h"
-#include "process.h"
+
+FILE* out_file;
 
 char** str_split(char* a_str, const char a_delim) {
   char** result = 0;
@@ -53,9 +54,27 @@ void read_file(char* file_name) {
 
   while ((read = getline(&line, &len, fp)) != -1) {
     process_detail = str_split(line, ' ');
-    insert_new(atoi(process_detail[0]), process_detail[1], atoi(process_detail[2]), atoi(process_detail[3]), 0);
+    insert_new(atof(process_detail[0]), atof(process_detail[1]), atof(process_detail[2]), strtok(process_detail[3], "\n"));
   }
 
-  reverse();
+  reverse();  
   fclose(fp);
+}
+
+void create_out_file(char* file_name) {
+  out_file = fopen(file_name, "w");
+  if (file_name == NULL)
+  {
+      printf("Erro ao criar o arquivo de saida.\n");
+      exit(1);
+  }
+
+}
+
+void insert_line(struct process* p, float end_time) {
+  fprintf(out_file, "%s %.1f %.1f\n", p->name, end_time, end_time - p->arrival_time);
+} 
+
+void close_file() {
+  fclose(out_file);
 }
